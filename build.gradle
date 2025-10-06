@@ -48,15 +48,21 @@ tasks.named('test') {
 
 bootJar {
     enabled = true
-    archiveFileName = 'bankingapp.jar'
-    archiveClassifier.set("") // <-- This ensures it doesn't get a 'plain' classifier
+    archiveFileName = 'bankingapp.jar'  // Name of the Spring Boot fat JAR
+    archiveClassifier.set("") // Ensures no classifier is added (like 'plain')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// Disable the default 'jar' task to avoid creating an unnecessary JAR
+tasks.withType(Jar) {
+    enabled = false
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact tasks.named('bootJar').get() // <-- publish the Spring Boot fat JAR
+            // Ensure only the bootJar task (Spring Boot fat JAR) is published
+            artifact tasks.named('bootJar').get()
 
             versionMapping {
                 usage('java-api') {
