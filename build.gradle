@@ -1,7 +1,8 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.10'  // Updated to Spring Boot 3.4.10
+    id 'org.springframework.boot' version '3.4.10'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'maven-publish'
 }
 
 group = 'com.bankingmanagementwithmvc'
@@ -9,7 +10,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)  // Java 17 for compatibility
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -44,6 +45,34 @@ tasks.named('test') {
 
 bootJar {
     enabled = true
-    archiveFileName = 'bankingapp.jar'  // Customize the jar name if necessary
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE  // Ensure no duplicate files are added
+    archiveFileName = 'bankingapp.jar'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact tasks.named('bootJar')  // Use Spring Boot JAR
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionResult()
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "nexus"
+            url = uri("http://18.224.64.123:8081/repository/maven-snapshots/")
+            allowInsecureProtocol = true
+            credentials {
+                username = "admin"
+                password = "xyz"
+            }
+        }
+    }
 }
