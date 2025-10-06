@@ -76,7 +76,7 @@ publishing {
             allowInsecureProtocol = true
             credentials {
                 username = "admin"
-                password = "omkar24555"
+                password = "xyz"
             }
         }
     }
