@@ -46,23 +46,28 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+// Ensure 'bootJar' task runs and is configured correctly
 bootJar {
     enabled = true
-    archiveFileName = 'bankingapp.jar'  // Name of the Spring Boot fat JAR
-    archiveClassifier.set("") // Ensures no classifier is added (like 'plain')
+    archiveFileName = 'bankingapp.jar'
+    archiveClassifier.set("") // <-- This ensures it doesn't get a 'plain' classifier
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-// Disable the default 'jar' task to avoid creating an unnecessary JAR
-tasks.withType(Jar) {
-    enabled = false
+// Force rebuild by clearing previous task outputs
+task cleanBuild(type: Delete) {
+    delete rootProject.buildDir
 }
 
+task buildAndPublish {
+    dependsOn cleanBuild, build, publish
+}
+
+// Define publishing task
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            // Ensure only the bootJar task (Spring Boot fat JAR) is published
-            artifact tasks.named('bootJar').get()
+            artifact tasks.named('bootJar').get()  // Publish the Spring Boot fat JAR
 
             versionMapping {
                 usage('java-api') {
